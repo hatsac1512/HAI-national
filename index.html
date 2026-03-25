@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HAI Survey">
+<meta name="theme-color" content="#009ADE">
+<title>HAI Surveillance Evaluation — WHO WPRO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+
+// ── WHO Logo SVG ──
+const WHO_LOGO_SRC = "data:image/png;base64,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";
+
+const WHOLogo = () => (
+  <div style={{display:'flex',alignItems:'center',gap:'14px',justifyContent:'center'}}>
+    <img src={WHO_LOGO_SRC} alt="WHO" style={{width:'56px',height:'56px',objectFit:'contain'}} />
+    <div style={{textAlign:'left'}}>
+      <div style={{fontSize:'15px',fontWeight:700,color:'#009ADE',letterSpacing:'0.3px',lineHeight:1.3}}>World Health Organization</div>
+      <div style={{fontSize:'12px',fontWeight:400,color:'#4A5D72',marginTop:'1px'}}>Western Pacific Region</div>
+    </div>
+  </div>
+);
+
+// ── Condition Logic Map ──
+// { questionId: { dependsOn: "qX", condition: value | [values] | fn } }
+const CONDITIONS = {
+  q10: { dep: "q9", val: "Yes" },
+  q11: { dep: "q9", val: "Yes" },
+  q12: { dep: "q9", val: "Yes" },
+  q13: { dep: "q9", val: "Yes" },
+  q14: { dep: "q13", val: "Yes" },
+  q15: { dep: "q13", val: "Yes" },
+  q17: { dep: "q16", val: "Yes" },
+  q18: { dep: "q16", val: "Yes" },
+  q20: { dep: "q19", val: "Yes" },
+  q24: { dep: "q23", val: "Yes" },
+  q25: { dep: "q23", val: "Yes" },
+  q26: { dep: "q25", val: "No" },
+  q27: { dep: "q23", val: "Yes" },
+  q28: { dep: "q27", vals: ["Yes (same as IPC national lead)", "Yes (different from IPC national lead)"] },
+  q29: { dep: "q27", vals: ["Yes (same as IPC national lead)", "Yes (different from IPC national lead)"] },
+  q30: { dep: "q27", vals: ["Yes (same as IPC national lead)", "Yes (different from IPC national lead)"] },
+  q31: { dep: "q27", vals: ["Yes (same as IPC national lead)", "Yes (different from IPC national lead)"] },
+  q32: { dep: "q31", val: "Yes" },
+  q33: { dep: "q31", val: "Yes" },
+  q34: { dep: "q23", val: "Yes" },
+  q35: { dep: "q34", val: "Yes" },
+  q36: { dep: "q34", val: "Yes" },
+  q37: { dep: "q34", val: "Yes" },
+  q38: { dep: "q23", val: "Yes" },
+  q39: { dep: "q38", vals: ["Partially integrated", "Fully integrated"] },
+  q41: { dep: "q40", val: "Yes" },
+  q43: { dep: "q42", val: "Yes" },
+  q44: { dep: "q42", val: "Yes" },
+  q46: { dep: "q45", val: "Yes" },
+  q47: { dep: "q45", val: "Yes" },
+  q48: { dep: "q45", val: "Yes" },
+  q49: { dep: "q45", val: "Yes" },
+  q51: { dep: "q50", val: "Yes" },
+  q52: { dep: "q50", val: "Yes" },
+  q55: { dep: "q54", val: "Yes" },
+  q62: { dep: "q61", val: "Yes" },
+  q64: { dep: "q63", vals: ["Yes reporting (HCF are conducting surveillance and are reporting)"] },
+  q65: { dep: "q63", vals: ["Yes reporting (HCF are conducting surveillance and are reporting)"] },
+  q66: { dep: "q63", vals: ["Yes reporting (HCF are conducting surveillance and are reporting)"] },
+  q68: { dep: "q67", vals: ["Yes (we receive HAI surveillance data and we check quality)"] },
+  q71: { dep: "q70", vals: ["Yes (we receive data and we integrate)"] },
+  q74: { dep: "q73", val: "Yes" },
+  q75: { dep: "q73", val: "Yes" },
+  q76: { dep: "q73", val: "Yes" },
+  q77: { dep: "q73", val: "Yes" },
+  q80: { dep: "q79", vals: ["Yes (in our programme)", "Yes (in another programme)"] },
+  q82: { dep: "q81", vals: ["Yes (we receive HAI surveillance data, and we analyze)"] },
+  q84: { dep: "q83", val: "Yes" },
+  q86: { dep: "q85", val: "Yes" },
+  q87: { dep: "q85", val: "Yes" },
+  q88: { dep: "q85", val: "Yes" },
+  q89: { dep: "q85", val: "Yes" },
+  q92: { dep: "q91", vals: ["Yes (in our programme)", "Yes (in another programme)"] },
+  q95: { dep: "q94", val: "Yes" },
+  q98: { dep: "q97", val: "Yes" },
+  q99: { dep: "q97", val: "Yes" },
+  q100: { dep: "q97", val: "Yes" },
+  q106: { dep: "q105", vals: ["Yes (We receive HAI surveillance data, and we develop a national HAI surveillance report)"] },
+  q108: { dep: "q107", val: "Yes" },
+  q109: { dep: "q107", val: "Yes" },
+  q110: { dep: "q107", val: "Yes" },
+  q113: { dep: "q112", val: "Yes" },
+  q116: { dep: "q115", val: "Yes" },
+  q118: { dep: "q117", vals: ["Yes (We have an HAI surveillance system and did an evaluation over the past 3-5 years)"] },
+  q121: { dep: "q120", val: "Yes" },
+  q122: { dep: "q120", val: "Yes" },
+  q123: { dep: "q120", val: "Yes" },
+};
+
+function isVisible(qId, fd) {
+  const c = CONDITIONS[qId];
+  if (!c) return true;
+  const v = fd[c.dep] || "";
+  if (c.val) return v === c.val;
+  if (c.vals) return c.vals.includes(v);
+  return true;
+}
+
+// ── Steps/Sections for wizard ──
+const STEPS = [
+  {
+    id: "intro", title: "Welcome", icon: "👋",
+    questions: [
+      { id: "q1", num: 1, label: "Please confirm your participation in this survey by selecting \"Yes\". You may withdraw at any time.", type: "radio", required: true, options: ["Yes", "No"] },
+    ]
+  },
+  {
+    id: "general", title: "General Information", icon: "📋",
+    questions: [
+      { id: "q2", num: 2, label: "Name of Country", type: "text", required: true },
+      { id: "q3", num: 3, label: "Date of assessment", type: "date", required: true },
+      { id: "q4", num: 4, label: "Name of survey respondent", type: "text", required: true },
+      { id: "q5", num: 5, label: "Your professional title/job title", type: "text", required: true },
+      { id: "q6", num: 6, label: "Your organization", type: "text", required: true },
+      { id: "q7", num: 7, label: "Email address", type: "email", required: true },
+    ]
+  },
+  {
+    id: "ipc", title: "National IPC Programme", icon: "🏥",
+    questions: [
+      { id: "q8", num: 8, label: "Do you have an active national IPC programme?", type: "radio", required: true, options: ["Yes", "No"], note: "ACTIVE PROGRAMME is defined as a functioning programme with annual work plans and budget." },
+      { id: "q9", num: 9, label: "Does the national IPC programme have an appointed national IPC lead/focal point?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q10", num: 10, label: "If \"Yes\", Year of appointment of the national IPC lead/focal point?", type: "text", required: true },
+      { id: "q11", num: 11, label: "The appointed national IPC lead/focal point has undergone IPC training?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q12", num: 12, label: "Is the appointed national IPC lead/focal point working full-time or part-time?", type: "radio", required: true, options: ["Full-time", "Part-time"] },
+      { id: "q13", num: 13, label: "Does the national IPC lead/focal point have additional staff (team) to provide technical support?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q14", num: 14, label: "If \"Yes\", How many members exist? (excluding the national IPC lead)", type: "text", required: true },
+      { id: "q15", num: 15, label: "List backgrounds of members?", type: "checkbox", required: true, options: ["Doctors", "Nurses", "Pharmacists", "Other"] },
+      { id: "q16", num: 16, label: "Does a national IPC committee (or equivalent structure) exist to support the national IPC programme?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q17", num: 17, label: "If \"Yes\", Year of appointment of the committee?", type: "text", required: true },
+      { id: "q18", num: 18, label: "If \"Yes\", Number of members in the national IPC committee?", type: "text", required: true },
+      { id: "q19", num: 19, label: "Does your national IPC programme have a dedicated budget?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q20", num: 20, label: "If \"Yes\", Source of the budget?", type: "checkbox", required: true, options: ["Governmental", "Other"] },
+      { id: "q21", num: 21, label: "Total number of tertiary healthcare facilities (HCFs) in the country?", type: "text", required: true },
+      { id: "q22", num: 22, label: "Total number of secondary HCFs in the country?", type: "text", required: true },
+    ]
+  },
+  {
+    id: "governance", title: "HAI Governance & Regulation", icon: "⚖️",
+    questions: [
+      { id: "q23", num: 23, label: "Is there an active national HAI surveillance programme/system in place?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q24", num: 24, label: "If \"Yes\", How long has the national HAI surveillance programme/system been in operation? (years)", type: "text", required: true },
+      { id: "q25", num: 25, label: "Is the national HAI surveillance programme/system part of the national IPC programme?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q26", num: 26, label: "If \"No\", With which programme is the HAI surveillance system affiliated to?", type: "text", required: true },
+      { id: "q27", num: 27, label: "Is a national HAI surveillance lead designated to coordinate/supervise the national HAI surveillance programme/system?", type: "radio", required: true, options: ["Yes (same as IPC national lead)", "Yes (different from IPC national lead)", "No"] },
+      { id: "q28", num: 28, label: "If \"Yes\", Year of start?", type: "text", required: true },
+      { id: "q29", num: 29, label: "Is the HAI surveillance lead working full-time or part-time?", type: "radio", required: true, options: ["Full-time", "Part-time", "Other"] },
+      { id: "q30", num: 30, label: "Background/Specialty of HAI surveillance lead?", type: "checkbox", required: true, options: ["Medical doctor", "Nurse", "Public health", "Epidemiology", "Microbiology", "Infectious diseases", "Other"] },
+      { id: "q31", num: 31, label: "Has the national HAI surveillance lead received training on HAI surveillance?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q32", num: 32, label: "If \"Yes\", Type of training?", type: "radio", required: true, options: ["Online", "In person", "Other"] },
+      { id: "q33", num: 33, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q34", num: 34, label: "Is there a technical multidisciplinary HAI surveillance group assigned to support the national HAI surveillance system and lead?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q35", num: 35, label: "If \"Yes\", Year of start?", type: "text", required: true },
+      { id: "q36", num: 36, label: "How many members?", type: "text", required: true },
+      { id: "q37", num: 37, label: "Specialties and background", type: "checkbox", required: true, options: ["Public health", "Epidemiology", "Microbiology", "Infectious diseases", "Other"] },
+      { id: "q38", num: 38, label: "Is the active national HAI surveillance programme integrated with other national public health surveillance programmes?", type: "radio", required: true, options: ["Not integrated", "Partially integrated", "Fully integrated", "Don't know"] },
+      { id: "q39", num: 39, label: "If integrated, to which surveillance programme?", type: "checkbox", required: true, options: ["AMR Surveillance", "Emergency/IHR", "Other"] },
+      { id: "q40", num: 40, label: "Are there laws or regulations mandating HAI surveillance?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q41", num: 41, label: "If \"Yes\", Is there an enforcement mechanism to ensure compliance?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q42", num: 42, label: "Does the national HAI surveillance programme have any financial resource?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q43", num: 43, label: "If \"Yes\", Sources of funding?", type: "checkbox", required: true, options: ["Government", "Other"] },
+      { id: "q44", num: 44, label: "Is funding regular?", type: "radio", required: true, options: ["Yes", "No"] },
+    ]
+  },
+  {
+    id: "planning", title: "Strategic Planning", icon: "📐",
+    questions: [
+      { id: "q45", num: 45, label: "Do you have capacities in your HAI surveillance programme to develop a national HAI surveillance strategic plan?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q46", num: 46, label: "Does the country have a national HAI surveillance strategic plan?", type: "radio", required: true, options: ["Yes (Plan available, but not implemented)", "Yes (Plan available & partially implemented)", "Yes (Plan available & fully implemented)", "No plans"] },
+      { id: "q47", num: 47, label: "Does the plan include antimicrobial resistant pathogens and/or pathogens prone to outbreaks (PPO)?", type: "radio", required: true, options: ["Yes (to AMR)", "Yes (to pathogens prone to outbreak)", "No (no to AMR and PPO)", "Don't know"] },
+      { id: "q48", num: 48, label: "Who developed the plan?", type: "radio", required: true, options: ["National IPC lead", "HAI technical multidisciplinary group", "Don't know", "Other"] },
+      { id: "q49", num: 49, label: "Year of development of the plan?", type: "text", required: true },
+    ]
+  },
+  {
+    id: "coverage", title: "Implementation & Coverage", icon: "🌐",
+    questions: [
+      { id: "q50", num: 50, label: "Do you have any of the secondary or tertiary HCF conduct HAI surveillance in your country?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q51", num: 51, label: "How many tertiary level HCFs are conducting HAI surveillance?", type: "text", required: true },
+      { id: "q52", num: 52, label: "How many secondary level HCFs are conducting HAI surveillance?", type: "text", required: true },
+    ]
+  },
+  {
+    id: "datacollection", title: "Data Collection", icon: "📊",
+    questions: [
+      { id: "q53", num: 53, label: "Do you have capacities to develop/implement standardized HAI surveillance data collection protocol?", type: "radio", required: true, options: ["Yes", "No", "Don't know"], note: "Capacities may include public health specialists, epidemiologists, infectious diseases experts, hospital epidemiologists with IPC background." },
+      { id: "q54", num: 54, label: "Do you have a written standardized HAI surveillance data collection protocol?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q55", num: 55, label: "If \"Yes\", Who developed the protocol?", type: "text", required: true },
+      { id: "q56", num: 56, label: "Is the standardized protocol distributed to all HCFs?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q57", num: 57, label: "Does the protocol include standardized data collection questionnaires for use by HCF?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q58", num: 58, label: "Does the protocol state who should collect the data at the HCF level?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q59", num: 59, label: "Does the protocol include advise on sources of data collection at HCF level?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q60", num: 60, label: "Does the protocol specify a mechanism for HCF to report their HAI surveillance data to the national level?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q61", num: 61, label: "Do you have a mechanism that allows HCF report their HAI surveillance data to the national level?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q62", num: 62, label: "Mechanism of reporting available?", type: "radio", required: true, options: ["Manual", "Electronic", "Other"] },
+      { id: "q63", num: 63, label: "For HCFs conducting HAI surveillance, do they report their data to national level?", type: "radio", required: true, options: ["Yes reporting (HCF are conducting surveillance and are reporting)", "No reporting (HCF are conducting surveillance and are not reporting)", "No (No HCF are conducting surveillance)"] },
+      { id: "q64", num: 64, label: "Method of reporting HAI surveillance data from HCF to the national level?", type: "radio", required: true, options: ["Manual (Paper-based)", "Electronic", "Don't know", "Other"] },
+      { id: "q65", num: 65, label: "Frequency of reporting?", type: "radio", required: true, options: ["Monthly", "Quarterly", "Annually", "Other"] },
+      { id: "q66", num: 66, label: "How many HCFs are regularly reporting (secondary and tertiary)?", type: "text", required: true },
+      { id: "q67", num: 67, label: "Do you check the quality of the HAI surveillance data reported by HCF?", type: "radio", required: true, options: ["Yes (we receive HAI surveillance data and we check quality)", "No (we receive HAI surveillance data, but we don't check quality)", "No (we don't receive HAI surveillance data from HCF)"] },
+      { id: "q68", num: 68, label: "What indicators are used to check data quality?", type: "checkbox", required: true, options: ["Completeness", "Consistency", "Accuracy", "Don't know", "Other"] },
+      { id: "q69", num: 69, label: "Do you have capacity to check quality of HAI surveillance data?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q70", num: 70, label: "Do you integrate all HAI surveillance data reported by HCFs?", type: "radio", required: true, options: ["Yes (we receive data and we integrate)", "No integration (we receive data, but we don't integrate)", "No (we don't receive HAI surveillance data from HCF)"] },
+      { id: "q71", num: 71, label: "Method of integration?", type: "radio", required: true, options: ["Manual", "Electronic", "Other"] },
+      { id: "q72", num: 72, label: "Do you have a centralized database including HAI surveillance data from HCFs?", type: "radio", required: true, options: ["Yes", "No", "Other"] },
+      { id: "q73", num: 73, label: "Do you provide training to HCFs on HAI surveillance data collection?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q74", num: 74, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q75", num: 75, label: "Who provides the training?", type: "text", required: true },
+      { id: "q76", num: 76, label: "Training topics?", type: "text", required: true },
+      { id: "q77", num: 77, label: "Frequency of training?", type: "text", required: true },
+      { id: "q78", num: 78, label: "What challenges do you face in HAI surveillance data collection?", type: "textarea", required: true },
+    ]
+  },
+  {
+    id: "analysis", title: "Data Analysis", icon: "📈",
+    questions: [
+      { id: "q79", num: 79, label: "Do you have capacities to analyze HAI surveillance data?", type: "radio", required: true, options: ["Yes (in our programme)", "Yes (in another programme)", "No capacities"] },
+      { id: "q80", num: 80, label: "Who is responsible for analysis at the national level?", type: "text", required: true },
+      { id: "q81", num: 81, label: "Do you analyze national HAI surveillance data?", type: "radio", required: true, options: ["Yes (we receive HAI surveillance data, and we analyze)", "No (We receive HAI surveillance data, but we don't analyze)", "No (We don't receive HAI surveillance data from HCF)"] },
+      { id: "q82", num: 82, label: "How often do you analyze?", type: "radio", required: true, options: ["Monthly", "Quarterly", "Annually", "Other"] },
+      { id: "q83", num: 83, label: "Are national HAI indicators identified?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q84", num: 84, label: "Please provide examples of indicators", type: "checkbox", required: true, options: ["Aggregated infection rates", "Reduction in infection rates", "AMR pattern", "Trends of infection", "Stratification by HCF", "Don't know", "Other"] },
+      { id: "q85", num: 85, label: "Do you provide training to HCFs on methods of data analysis?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q86", num: 86, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q87", num: 87, label: "Who provides the training?", type: "text", required: true },
+      { id: "q88", num: 88, label: "Training topics?", type: "text", required: true },
+      { id: "q89", num: 89, label: "Frequency of training?", type: "text", required: true },
+      { id: "q90", num: 90, label: "What challenges do you face in HAI surveillance data analysis?", type: "textarea", required: true },
+    ]
+  },
+  {
+    id: "interpretation", title: "Data Interpretation", icon: "🔍",
+    questions: [
+      { id: "q91", num: 91, label: "Do you have capacities to interpret HAI surveillance data?", type: "radio", required: true, options: ["Yes (in our programme)", "Yes (in another programme)", "No capacities"] },
+      { id: "q92", num: 92, label: "Who is responsible for data interpretation?", type: "radio", required: true, options: ["HAI surveillance team", "HAI multidisciplinary group", "IPC team", "Other"] },
+      { id: "q93", num: 93, label: "Do you interpret national HAI surveillance data?", type: "radio", required: true, options: ["Yes (we receive HAI surveillance data, and we interpret)", "No (We receive HAI surveillance data, but we don't interpret)", "No (We don't receive HAI surveillance data from HCF)"] },
+      { id: "q94", num: 94, label: "Do you have criteria for interpretation?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q95", num: 95, label: "List criteria?", type: "checkbox", required: true, options: ["Trends and Patterns", "Benchmarking with other countries", "Benchmarking with international data", "Risk factor analysis", "Don't know", "Other"] },
+      { id: "q96", num: 96, label: "Do you utilize data to advise HCFs on IPC quality improvements?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q97", num: 97, label: "Do you provide training to HCFs on data interpretation?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q98", num: 98, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q99", num: 99, label: "Who provides the training?", type: "text", required: true },
+      { id: "q100", num: 100, label: "Frequency of training?", type: "text", required: true },
+      { id: "q101", num: 101, label: "What challenges do you face in data interpretation?", type: "textarea", required: true },
+    ]
+  },
+  {
+    id: "communication", title: "Communication & Feedback", icon: "💬",
+    questions: [
+      { id: "q102", num: 102, label: "Do you have capacities to communicate/feedback HAI surveillance data?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q103", num: 103, label: "Do you have a national HAI surveillance communication plan?", type: "radio", required: true, options: ["Yes", "No", "Don't know"] },
+      { id: "q104", num: 104, label: "Have you identified stakeholders who should receive feedback?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q105", num: 105, label: "Do you develop national HAI reports summarizing results?", type: "radio", required: true, options: ["Yes (We receive HAI surveillance data, and we develop a national HAI surveillance report)", "No reports (We receive data, but don't develop a report)", "No (We don't receive HAI surveillance data from HCF)"] },
+      { id: "q106", num: 106, label: "Do you provide feedback (e.g. report) to HCFs?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q107", num: 107, label: "Do you provide training on data communication/feedback?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q108", num: 108, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q109", num: 109, label: "Who provides the training?", type: "text", required: true },
+      { id: "q110", num: 110, label: "Frequency of training?", type: "text", required: true },
+      { id: "q111", num: 111, label: "What challenges do you face in communication/feedback?", type: "textarea", required: true },
+    ]
+  },
+  {
+    id: "me", title: "Monitoring & Evaluation", icon: "✅",
+    questions: [
+      { id: "q112", num: 112, label: "Do you have capacities to conduct M&E of HAI surveillance?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q113", num: 113, label: "Who is responsible for M&E?", type: "text", required: true },
+      { id: "q114", num: 114, label: "Do you implement monitoring (regular periodic reviews) of the national HAI surveillance system?", type: "radio", required: true, options: ["Yes (We have an HAI surveillance system and we do monitoring)", "No (we have an HAI surveillance system, but we don't do monitoring)", "No (as we don't have a HAI surveillance system)"] },
+      { id: "q115", num: 115, label: "Do you have criteria for monitoring?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q116", num: 116, label: "List monitoring criteria?", type: "checkbox", required: true, options: ["Completeness of data", "Quality of data", "Timeliness of data collection, analysis and reporting of data", "Other"] },
+      { id: "q117", num: 117, label: "Has there been an evaluation of the HAI surveillance system in the past 3-5 years?", type: "radio", required: true, options: ["Yes (We have an HAI surveillance system and did an evaluation over the past 3-5 years)", "No (We have an HAI surveillance system, and we didn't do an evaluation)", "No (We don't have a HAI surveillance system)"] },
+      { id: "q118", num: 118, label: "Have you revised the plan based on evaluation results?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q119", num: 119, label: "Have you utilized findings for future planning?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q120", num: 120, label: "Do you provide training on M&E?", type: "radio", required: true, options: ["Yes", "No"] },
+      { id: "q121", num: 121, label: "Duration of training (days)?", type: "text", required: true },
+      { id: "q122", num: 122, label: "Who provides the training?", type: "text", required: true },
+      { id: "q123", num: 123, label: "Frequency of training?", type: "text", required: true },
+      { id: "q124", num: 124, label: "What challenges do you face in M&E?", type: "textarea", required: true },
+    ]
+  },
+];
+
+const allQs = STEPS.flatMap(s => s.questions);
+
+function exportCSV(responses) {
+  const h = ["#", "Timestamp", ...allQs.map(q => `Q${q.num}`)];
+  const esc = v => { const s = String(v||""); return s.includes(",")||s.includes('"')||s.includes("\n") ? `"${s.replace(/"/g,'""')}"` : s; };
+  const rows = responses.map((r,i) => [i+1, r.ts, ...allQs.map(q => esc(r.a[q.id]||""))].join(","));
+  const csv = "\uFEFF" + [h.map(esc).join(","), ...rows].join("\n");
+  const b = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(b);
+  a.download = `HAI_National_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+}
+
+const SCRIPT = `function doPost(e) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var d = JSON.parse(e.postData.contents);
+  if (sh.getLastRow() === 0) { sh.appendRow([...Object.keys(d), "Timestamp"]); }
+  var h = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0];
+  sh.appendRow(h.map(function(k){ return k==="Timestamp"? new Date().toLocaleString() : d[k]||""; }));
+  return ContentService.createTextOutput(JSON.stringify({ok:1})).setMimeType(ContentService.MimeType.JSON);
+}`;
+
+// ── STYLES ──
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --b:#009ADE;--bd:#0072B1;--bdr:#005587;--bl:#E8F4FD;--blr:#F2F9FE;
+  --bg:#F5F7FA;--w:#fff;--g:#EEF2F7;--g2:#D4DDE8;--g3:#BCC8D6;
+  --t:#1A2B3C;--t2:#4A5D72;--t3:#7E91A5;
+  --ok:#2E8B57;--okb:#E8F5ED;--err:#D32F2F;--errb:#FDEDED;--warn:#F4A100;
+  --f:'Source Sans 3',system-ui,sans-serif;--r:12px;--rs:8px;
+}
+body{font-family:var(--f);background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased}
+.app{max-width:600px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+
+/* Header */
+.hdr{background:var(--w);padding:20px 20px 16px;border-bottom:1px solid var(--g2);text-align:center}
+.hdr svg{margin-bottom:10px}
+.hdr h1{font-size:15.5px;font-weight:700;color:var(--bdr);line-height:1.35;margin-bottom:4px;padding:0 10px}
+.hdr p{font-size:12px;color:var(--t3);line-height:1.5}
+.hdr-sub{font-size:13px;font-weight:600;color:var(--b);margin:6px 0 2px}
+.intro-toggle{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--g2);background:var(--w);color:var(--b);font-family:var(--f);font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.intro-toggle:hover{border-color:var(--b);background:var(--bl)}
+.intro-panel{background:var(--w);border-top:1px solid var(--g);padding:0 20px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease}
+.intro-panel.open{max-height:2000px;padding:16px 20px 20px}
+.intro-section{margin-bottom:14px}
+.intro-section:last-child{margin-bottom:0}
+.intro-section h4{font-size:13px;font-weight:700;color:var(--bdr);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.intro-section h4 .inum{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--b);color:#fff;font-size:10px;flex-shrink:0}
+.intro-section p{font-size:12.5px;color:var(--t2);line-height:1.65;text-align:left}
+.intro-section a{color:var(--b);text-decoration:none;font-weight:600}
+.intro-section a:hover{text-decoration:underline}
+.intro-divider{height:1px;background:var(--g);margin:12px 0}
+
+/* Top progress */
+.tprog{background:var(--w);padding:12px 20px;border-bottom:1px solid var(--g);display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20}
+.tprog-bar{flex:1;height:5px;background:var(--g);border-radius:3px;overflow:hidden}
+.tprog-fill{height:100%;background:var(--b);border-radius:3px;transition:width .4s}
+.tprog-fill.done{background:var(--ok)}
+.tprog-txt{font-size:12px;font-weight:700;color:var(--b);min-width:36px;text-align:right}
+.tprog-txt.done{color:var(--ok)}
+
+/* Step nav dots */
+.dots{background:var(--w);padding:10px 16px;border-bottom:1px solid var(--g);display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dots::-webkit-scrollbar{display:none}
+.dot{min-width:32px;height:32px;border-radius:50%;border:2px solid var(--g2);background:var(--w);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t3);cursor:pointer;transition:.2s;flex-shrink:0}
+.dot:hover{border-color:var(--b)}
+.dot.active{background:var(--b);border-color:var(--b);color:#fff}
+.dot.completed{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot-label{font-size:10px;color:var(--t3);text-align:center;margin-top:2px;white-space:nowrap}
+.dot-wrap{display:flex;flex-direction:column;align-items:center;min-width:42px}
+
+/* Content */
+.content{flex:1;padding:16px 16px 100px;overflow-y:auto}
+.step-title{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.step-title .icon{font-size:24px}
+.step-title h2{font-size:17px;font-weight:700;color:var(--bdr)}
+.step-title .count{font-size:11px;color:var(--t3);font-weight:500}
+
+/* Question card */
+.qcard{background:var(--w);border:1.5px solid var(--g2);border-radius:var(--r);padding:16px;margin-bottom:12px;transition:border-color .2s;animation:fadeIn .25s ease}
+.qcard:focus-within{border-color:var(--b)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qcard.cond{border-left:3px solid var(--b);background:var(--blr)}
+.qlbl{font-size:14px;font-weight:600;color:var(--t);margin-bottom:8px;line-height:1.45}
+.req{color:var(--err);margin-left:2px}
+.note{font-size:11.5px;color:var(--t3);font-style:italic;margin-bottom:10px;padding:8px 12px;background:var(--bl);border-radius:var(--rs);border-left:3px solid var(--b);line-height:1.5}
+
+/* Inputs */
+.inp{width:100%;background:var(--w);border:1.5px solid var(--g2);border-radius:var(--rs);padding:11px 14px;color:var(--t);font-family:var(--f);font-size:14px;outline:0;transition:.15s}
+.inp:focus{border-color:var(--b);box-shadow:0 0 0 3px rgba(0,154,222,0.1)}
+.inp::placeholder{color:var(--t3)}
+.ta{min-height:80px;resize:vertical;line-height:1.55}
+
+/* Choices */
+.cg{display:flex;flex-direction:column;gap:7px}
+.ci{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-radius:var(--rs);background:var(--w);border:1.5px solid var(--g2);cursor:pointer;transition:.15s;font-size:13.5px;color:var(--t);line-height:1.4;-webkit-tap-highlight-color:transparent}
+.ci:active{transform:scale(0.98)}
+.ci:hover{border-color:var(--b)}
+.ci.sel{border-color:var(--b);background:var(--bl)}
+.ci input{accent-color:var(--b);margin-top:2px;width:18px;height:18px;flex-shrink:0}
+
+/* Bottom bar */
+.bbar{position:fixed;bottom:0;left:0;right:0;background:var(--w);border-top:1px solid var(--g2);padding:12px 16px;display:flex;gap:10px;z-index:20;max-width:600px;margin:0 auto}
+.bbar .btn{flex:1}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border:none;border-radius:var(--rs);font-family:var(--f);font-size:14px;font-weight:600;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(0.97)}
+.btn-p{background:var(--b);color:#fff;box-shadow:0 2px 8px rgba(0,154,222,0.2)}
+.btn-p:hover{background:var(--bd)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-o{background:var(--w);border:1.5px solid var(--g2);color:var(--t2)}
+.btn-o:hover{border-color:var(--b);color:var(--b)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-sm{padding:8px 14px;font-size:12.5px}
+
+/* Done */
+.done-screen{text-align:center;padding:40px 24px}
+.done-screen .check{width:64px;height:64px;border-radius:50%;background:var(--okb);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px}
+.done-screen h2{color:var(--ok);font-size:20px;margin-bottom:6px}
+.done-screen p{color:var(--t2);font-size:14px;margin-bottom:20px}
+
+/* Data tab */
+.dtab{padding:16px}
+.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.sc{background:var(--w);border-radius:var(--r);padding:14px;text-align:center;border:1px solid var(--g2)}
+.sv{font-size:24px;font-weight:700;color:var(--b)}
+.sl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+
+/* Export tab */
+.etab{padding:16px}
+.ecard{background:var(--w);border:1px solid var(--g2);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.ecard h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ecard p{font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.5}
+.gs{display:flex;gap:12px;margin-bottom:14px}
+.sn{width:22px;height:22px;min-width:22px;border-radius:50%;background:var(--b);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.stc h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.stc p,.stc li{font-size:12px;color:var(--t2);line-height:1.5}
+.stc ul{list-style:none;padding:0}.stc li::before{content:'→ ';color:var(--b)}
+.cb{background:var(--bg);border:1px solid var(--g2);border-radius:var(--rs);padding:12px;font-family:monospace;font-size:10.5px;line-height:1.5;color:var(--t2);overflow-x:auto;white-space:pre;margin:8px 0}
+.ur{display:flex;gap:8px}.ur .inp{flex:1}
+.badge{display:inline-flex;padding:3px 10px;border-radius:16px;font-size:11px;font-weight:600;background:var(--bl);color:var(--bd);border:1px solid rgba(0,154,222,0.15)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:10px 20px;background:var(--ok);color:#fff;border-radius:var(--r);font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:50;animation:pop .25s ease;white-space:nowrap}
+.toast.w{background:var(--warn);color:var(--t)}
+@keyframes pop{from{transform:translateX(-50%) translateY(10px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+
+/* Mode tabs */
+.mtabs{display:flex;background:var(--w);border-bottom:1px solid var(--g2)}
+.mtab{flex:1;padding:10px;border:none;background:0;font-family:var(--f);font-size:12.5px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2.5px solid transparent;transition:.15s}
+.mtab:hover{color:var(--t2)}
+.mtab.active{color:var(--b);border-bottom-color:var(--b)}
+
+/* Table */
+.tw{overflow-x:auto;border:1px solid var(--g2);border-radius:var(--r);background:var(--w)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:var(--blr);padding:8px;text-align:left;font-weight:700;color:var(--bdr);font-size:10px;text-transform:uppercase;border-bottom:2px solid var(--g2);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--g);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media(max-width:400px){
+  .hdr h1{font-size:14px}
+  .qlbl{font-size:13px}
+  .ci{padding:10px 12px;font-size:12.5px}
+}
+`;
+
+// ── MAIN APP ──
+function App() {
+  const [mode, setMode] = useState("form");
+  const [step, setStep] = useState(0);
+  const [fd, setFd] = useState({});
+  const [res, setRes] = useState([]);
+  const [toast, setToast] = useState(null);
+  const [done, setDone] = useState(false);
+  const [url, setUrl] = useState("https://script.google.com/macros/s/AKfycbz96ISnGUguC5UnBrWZ3pLN_FFFlAS2LQBwFoL23EV7yDe_rqwkZgav1hiw69T4tj8I/exec");
+  const [showIntro, setShowIntro] = useState(false);
+  const contentRef = useRef(null);
+
+  const show = (m, t="") => { setToast({m,t}); setTimeout(()=>setToast(null),2500); };
+
+  const cur = STEPS[step];
+  const visQs = cur ? cur.questions.filter(q => isVisible(q.id, fd)) : [];
+  const visReq = visQs.filter(q => q.required);
+  const visAns = visReq.filter(q => fd[q.id] && String(fd[q.id]).trim()).length;
+  const stepDone = visReq.length === visAns;
+
+  // Global progress
+  const allVis = STEPS.flatMap(s => s.questions.filter(q => isVisible(q.id, fd)));
+  const allVisReq = allVis.filter(q => q.required);
+  const allVisAns = allVisReq.filter(q => fd[q.id] && String(fd[q.id]).trim()).length;
+  const pct = allVisReq.length ? Math.round((allVisAns / allVisReq.length) * 100) : 0;
+
+  const isStepComplete = (i) => {
+    const s = STEPS[i];
+    const vq = s.questions.filter(q => isVisible(q.id, fd));
+    const vr = vq.filter(q => q.required);
+    return vr.length > 0 && vr.every(q => fd[q.id] && String(fd[q.id]).trim());
+  };
+
+  const goStep = (i) => { setStep(i); contentRef.current?.scrollTo(0, 0); };
+  const next = () => { if (step < STEPS.length - 1) goStep(step + 1); };
+  const prev = () => { if (step > 0) goStep(step - 1); };
+
+  const submit = async () => {
+    const missing = allVisReq.find(q => !fd[q.id] || !String(fd[q.id]).trim());
+    if (missing) { show(`⚠ Q${missing.num} required`, "w"); return; }
+    const entry = { ts: new Date().toISOString().replace("T"," ").substring(0,19), a: { ...fd } };
+    setRes(p => [...p, entry]);
+    if (url) {
+      try {
+        const pl = {}; allQs.forEach(q => { pl[`Q${q.num}`] = fd[q.id] || ""; });
+        await fetch(url, { method:"POST", mode:"no-cors", headers:{"Content-Type":"application/json"}, body:JSON.stringify(pl) });
+        show("✓ Synced to Google Sheets!");
+      } catch { show("✓ Saved locally"); }
+    } else { show("✓ Submitted!"); }
+    setFd({}); setDone(true); setStep(0);
+  };
+
+  const ri = q => {
+    const v = fd[q.id] || "";
+    const s = val => setFd(p => ({ ...p, [q.id]: val }));
+    switch (q.type) {
+      case "text": case "email": case "number":
+        return <input className="inp" type={q.type} placeholder="Enter your answer" value={v} onChange={e=>s(e.target.value)} />;
+      case "date":
+        return <input className="inp" type="date" value={v} onChange={e=>s(e.target.value)} />;
+      case "textarea":
+        return <textarea className="inp ta" placeholder="Enter your answer" value={v} onChange={e=>s(e.target.value)} />;
+      case "radio":
+        return (<div className="cg">{(q.options||[]).map((o,i)=>(<label key={i} className={`ci ${v===o?"sel":""}`}><input type="radio" name={q.id} checked={v===o} onChange={()=>s(o)}/><span>{o}</span></label>))}</div>);
+      case "checkbox": {
+        const sel = v ? v.split("||").filter(Boolean) : [];
+        return (<div className="cg">{(q.options||[]).map((o,i)=>(<label key={i} className={`ci ${sel.includes(o)?"sel":""}`}><input type="checkbox" checked={sel.includes(o)} onChange={e=>{const n=e.target.checked?[...sel,o]:sel.filter(x=>x!==o);s(n.join("||"));}}/><span>{o}</span></label>))}</div>);
+      }
+      default: return <input className="inp" value={v} onChange={e=>s(e.target.value)} />;
+    }
+  };
+
+  return (<>
+    <style>{CSS}</style>
+    <div className="app">
+      {/* Header */}
+      <div className="hdr">
+        <WHOLogo />
+        <h1>Evaluation of Healthcare-Associated Infection Surveillance Programs</h1>
+        <div className="hdr-sub">For National IPC Programme</div>
+        <p>National Level • 124 Questions • ~30–45 min</p>
+        <button className="intro-toggle" onClick={()=>setShowIntro(!showIntro)}>
+          {showIntro ? "Hide" : "Read"} Introduction
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" style={{transform:showIntro?"rotate(180deg)":"",transition:".2s"}}><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div className={`intro-panel ${showIntro?"open":""}`}>
+        <div className="intro-section">
+          <h4><span className="inum">1</span> Introduction</h4>
+          <p>This survey aims to collect data on the status of Healthcare-Associated Infection (HAI) surveillance programs at both national and facility levels within WHO Western Pacific Region (WPRO) Member States. It evaluates the integration of effective HAI surveillance as a core component of Infection Prevention and Control (IPC) programs, identifying critical areas for improvement and potential strategies to enhance implementation. The initiative, led by the WHO IPC, Maternal Child Health and Quality Safety (MCQ) unit, Division of Health Systems and Services (DHS), with support from WHO Country Offices, aligns with WHO's broader strategy to advance IPC program core components across Member States.</p>
+          <p style={{marginTop:8}}>To achieve these objectives, tailored data collection tools will be developed to evaluate the current status of HAI surveillance systems. These tools are structured into eight sections, incorporating the six fundamental elements of HAI surveillance outlined in the WHO practical handbook. Each section provides a detailed description of activities and best practices related to Healthcare-Associated Infection (HAI) surveillance. These include governance, integration, regulation, and resource allocation; strategic planning for HAI surveillance; implementation and coverage at various levels; and processes for data collection. The sections also cover methods for data analysis, communication and feedback of surveillance data, techniques for interpreting the data, and approaches to monitoring and evaluating HAI surveillance systems.</p>
+        </div>
+        <div className="intro-divider"/>
+        <div className="intro-section">
+          <h4><span className="inum">2</span> Time Expectation</h4>
+          <p>The survey will take approximately 30–45 minutes to complete. It consists of 124 questions, and we kindly request that you provide accurate and complete information where possible. If you do not have the information, please select <strong>"Don't know"</strong> or enter <strong>"DK"</strong> in the text fields.</p>
+        </div>
+        <div className="intro-divider"/>
+        <div className="intro-section">
+          <h4><span className="inum">3</span> Privacy Assurance</h4>
+          <p>All personal information provided (e.g., respondent names, email addresses) will be de-identified and will only be used for data verification purposes. Official clearance from the Ministry of Health (MOH) is not required, as this is a preliminary exercise meant to support the validation process during the regional workshop. However, we ask that you make your best effort to accurately capture your country's progress, as this data will contribute to the development of your country's IPC action plan during the meeting.</p>
+        </div>
+        <div className="intro-divider"/>
+        <div className="intro-section">
+          <h4><span className="inum">4</span> Data Handling</h4>
+          <p>Each participating national organization or health facility must assign a single focal point to enter data into the survey, ensuring consistency and preventing duplicate entries from multiple respondents within the same organization.</p>
+          <p style={{marginTop:6}}>All data collected will be securely maintained by WHO and will be shared with Member States upon request.</p>
+        </div>
+        <div className="intro-divider"/>
+        <div className="intro-section">
+          <h4><span className="inum">5</span> Technical Queries</h4>
+          <p>For any technical questions during the survey administration, please contact:<br/>
+            <a href="mailto:liz@who.int">Dr. Zhao Li — liz@who.int</a><br/>
+            <a href="mailto:vpham@who.int">Mr. Pham Van Hien — vpham@who.int</a>
+          </p>
+        </div>
+      </div>
+
+      {/* Mode tabs */}
+      <div className="mtabs">
+        <button className={`mtab ${mode==="form"?"active":""}`} onClick={()=>setMode("form")}>📝 Survey</button>
+        <button className={`mtab ${mode==="data"?"active":""}`} onClick={()=>setMode("data")}>📊 Data ({res.length})</button>
+        <button className={`mtab ${mode==="export"?"active":""}`} onClick={()=>setMode("export")}>⬇ Export</button>
+      </div>
+
+      {mode === "form" && !done && (<>
+        {/* Progress */}
+        <div className="tprog">
+          <div className="tprog-bar"><div className={`tprog-fill ${pct===100?"done":""}`} style={{width:`${pct}%`}}/></div>
+          <span className={`tprog-txt ${pct===100?"done":""}`}>{pct}%</span>
+        </div>
+
+        {/* Step dots */}
+        <div className="dots">
+          {STEPS.map((s,i) => (
+            <div key={s.id} className="dot-wrap" onClick={()=>goStep(i)}>
+              <div className={`dot ${i===step?"active":""}${isStepComplete(i)?" completed":""}`}>
+                {isStepComplete(i) ? "✓" : i+1}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="content" ref={contentRef}>
+          <div className="step-title">
+            <span className="icon">{cur.icon}</span>
+            <div>
+              <h2>{cur.title}</h2>
+              <span className="count">Step {step+1} of {STEPS.length} • {visQs.length} questions</span>
+            </div>
+          </div>
+
+          {visQs.map(q => {
+            const isCond = !!CONDITIONS[q.id];
+            return (
+              <div key={q.id} className={`qcard ${isCond?"cond":""}`}>
+                {q.note && <div className="note">{q.note}</div>}
+                <div className="qlbl">
+                  {q.num}. {q.label}
+                  {q.required && <span className="req"> *</span>}
+                </div>
+                {ri(q)}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="bbar">
+          {step > 0 && <button className="btn btn-o" onClick={prev}>← Back</button>}
+          {step < STEPS.length - 1 ? (
+            <button className="btn btn-p" onClick={next}>
+              Next →
+            </button>
+          ) : (
+            <button className="btn btn-ok" onClick={submit}>
+              ✉ Submit
+            </button>
+          )}
+        </div>
+      </>)}
+
+      {mode === "form" && done && (
+        <div className="content">
+          <div className="done-screen">
+            <div className="check">✅</div>
+            <h2>Thank You!</h2>
+            <p>Your evaluation has been recorded successfully.</p>
+            <button className="btn btn-p" onClick={()=>{setDone(false);setFd({});}}>Submit Another Response</button>
+          </div>
+        </div>
+      )}
+
+      {mode === "data" && (
+        <div className="dtab">
+          <div className="sg">
+            <div className="sc"><div className="sv">{res.length}</div><div className="sl">Responses</div></div>
+            <div className="sc"><div className="sv">124</div><div className="sl">Questions</div></div>
+            <div className="sc"><div className="sv">{STEPS.length}</div><div className="sl">Sections</div></div>
+          </div>
+          <div style={{display:"flex",gap:8,marginBottom:12}}>
+            <button className="btn btn-ok btn-sm" style={{flex:1}} onClick={()=>{if(!res.length){show("⚠ No data","w");return;}exportCSV(res);show("📥 Downloaded!");}}>⬇ Export CSV</button>
+            {res.length>0 && <button className="btn btn-sm" style={{background:"var(--errb)",color:"var(--err)",border:"none"}} onClick={()=>{setRes([]);show("Cleared");}}>🗑</button>}
+          </div>
+          {res.length===0 ? (
+            <div style={{textAlign:"center",padding:"40px 0",color:"var(--t3)"}}>
+              <div style={{fontSize:32,opacity:.3,marginBottom:8}}>📭</div>
+              <p style={{fontSize:13}}>No responses yet</p>
+            </div>
+          ) : (
+            <div className="tw" style={{maxHeight:350,overflowY:"auto"}}>
+              <table>
+                <thead><tr><th>#</th><th>Time</th><th>Country</th><th>Name</th><th>Org</th></tr></thead>
+                <tbody>{res.map((r,i)=>(<tr key={i}><td>{i+1}</td><td>{r.ts}</td><td>{r.a.q2||"—"}</td><td>{r.a.q4||"—"}</td><td>{r.a.q6||"—"}</td></tr>))}</tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {mode === "export" && (
+        <div className="etab">
+          <div className="ecard">
+            <h3>⬇ Download CSV / Excel</h3>
+            <p>Export all {res.length} responses as CSV file. Opens in Excel, Google Sheets, Numbers.</p>
+            <button className="btn btn-ok" style={{width:"100%"}} onClick={()=>{if(!res.length){show("⚠ No data","w");return;}exportCSV(res);show("📥 Downloaded!");}}>⬇ Download CSV</button>
+          </div>
+          <div className="ecard">
+            <h3>📊 Google Sheets Auto-Sync {url && <span className="badge" style={{marginLeft:6}}>✓</span>}</h3>
+            <div className="gs"><div className="sn">1</div><div className="stc"><h4>Create Spreadsheet</h4><p>sheets.google.com → New</p></div></div>
+            <div className="gs"><div className="sn">2</div><div className="stc"><h4>Apps Script</h4><p>Extensions → Apps Script</p></div></div>
+            <div className="gs"><div className="sn">3</div><div className="stc"><h4>Paste code & Save</h4></div></div>
+            <div className="cb">{SCRIPT}</div>
+            <div className="gs"><div className="sn">4</div><div className="stc"><h4>Deploy</h4><ul><li>Deploy → Web app</li><li>Execute as: Me</li><li>Access: Anyone</li></ul></div></div>
+            <div className="gs"><div className="sn">5</div><div className="stc"><h4>Paste URL below</h4></div></div>
+            <div className="ur">
+              <input className="inp" placeholder="https://script.google.com/..." value={url} onChange={e=>setUrl(e.target.value)} style={{fontSize:12.5}} />
+              <button className="btn btn-p btn-sm" onClick={()=>{if(url.includes("script.google.com"))show("✓ Connected!");else show("⚠ Invalid","w");}}>Go</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && <div className={`toast ${toast.t}`}>{toast.m}</div>}
+    </div>
+  </>);
+}
+
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
